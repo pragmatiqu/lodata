@@ -14,15 +14,24 @@ use SimpleXMLElement;
 class Reference
 {
     /**
-     * URI of the service document, without the xml/json suffix
-     * @var string $uri URI
+     * The URI SHOULD be a URL that locates the referenced document. If the URI is not dereferencable it
+     * SHOULD identify a well-known schema. The URI MAY be absolute or relative URI; relative URLs are
+     * relative to the URL of the document containing the reference, or relative to a base URL specified
+     * in a format-specific way.
+     *
+     * @var string $uri URI an absolute or relative URI without extension .xml or .json;
      */
     protected $uri;
 
     /**
-     * @var string $namespace Namespace
+     * @var string $namespace Namespace the namespace of a schema defined in the referenced CSDL document.
      */
     protected $namespace;
+
+    /**
+     * @var string $alias Alias a simple identifier that can be used in qualified names instead of the namespace.
+     */
+    protected $alias;
 
     /**
      * Append this reference to the provided XML element
@@ -35,7 +44,9 @@ class Reference
         $reference->addAttribute('Uri', $this->uri.'.xml');
         $include = $reference->addChild('Include');
         $include->addAttribute('Namespace', $this->namespace);
-
+        if (!is_null($this->alias)) {
+            $include->addAttribute('Alias', $this->alias);
+        }
         return $this;
     }
 
@@ -46,11 +57,15 @@ class Reference
      */
     public function appendJson(object $json): self
     {
+        $include = [
+            '$Namespace' => $this->namespace,
+        ];
+        if (!is_null($this->alias)) {
+            $include[]['$Alias'] = $this->alias;
+        }
         $json->{'$Reference'}[$this->uri.'.json'] = [
             '$Include' => [
-                [
-                    '$Namespace' => $this->namespace,
-                ]
+                $include
             ]
         ];
 
@@ -62,6 +77,6 @@ class Reference
      */
     public function __toString()
     {
-        return $this->namespace;
+        return $this->alias . '=' . $this->namespace;
     }
 }
