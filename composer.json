@@ -1,6 +1,7 @@
 {
-    "name": "flat3/lodata",
-    "description": "OData v4.01 Producer for Laravel",
+    "name": "pragmatiqu/lodata-modular",
+    "description": "Modular OData endpoint support based on Lodata (temporary bridge for LaravelUi5)",
+    "type": "library",
     "keywords": [
         "odata",
         "laravel",
